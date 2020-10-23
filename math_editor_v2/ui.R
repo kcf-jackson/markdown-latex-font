@@ -19,7 +19,8 @@ btn_style <- "margin: 6px 6px;"
 save_btn <- dom("i", list(
   id = "save_btn",
   className = "fas fa-save fa-lg",
-  style = btn_style
+  style = btn_style,
+  title = "Save"
 ))
 
 save_btn$onclick <- function() {
@@ -39,7 +40,8 @@ print_dom(save_btn, "#menu_bar")
 load_btn <- dom("i", list(
   id = "load_btn",
   className = "fas fa-upload fa-lg",
-  style = btn_style
+  style = btn_style,
+  title = "Load"
 ))
 
 load_btn$onclick <- function() {
@@ -57,23 +59,52 @@ file_input <- dom("input", list(
 
 file_input$onchange <- function() {
   declare(file, reader)
-  file <- this$files[0]
+  file <- file_input$files[0]
   reader <- FileReader$new()
   reader$onload <- function() {
-    editor$setValue(reader.result)
+    editor$setValue(reader$result)
   }
   reader$onerror <- function() {
-    editor$setValue(reader.error)
+    editor$setValue(reader$error)
   }
   reader$readAsText(file)
 }
 print_dom(file_input, "#menu_bar")
 
+# Load file from URL
+load_url_btn <- dom("i", list(
+  id = "load_url_btn",
+  className = "fas fa-globe-asia fa-lg",
+  style = btn_style,
+  title = "Load from URL"
+))
+
+load_url_btn$onclick <- function() {
+  url <- prompt(
+    "Please enter an URL to load from:",
+    "https://raw.githubusercontent.com/kcf-jackson/math-markdown/sample/readme.md"
+  )
+  if (url != JS_NULL && url != '') {
+    load_url(url)
+  }
+}
+
+print_dom(load_url_btn, "#menu_bar")
+
+load_url <- function(url) {
+  fetch(url)$then(function(response) {
+    response$text()$then(function(text) {
+      editor$setValue(text)
+    })
+  })
+}
+
 
 # Pdf version ----
 pdf_btn <- dom("i", list(id = "pdf_btn",
                          className = "fas fa-file-pdf fa-lg",
-                         style = btn_style))
+                         style = btn_style,
+                         title = "View HTML/PDF"))
 pdf_btn$onclick <- function() {
     PDF_FLAG <- !PDF_FLAG
     editor_change()
@@ -85,15 +116,16 @@ print_dom(pdf_btn, "#menu_bar")
 md_btn <- dom("select", list(
     id = "md_btn",
     className = "custom-select",
-    style = "margin: 0px 6px; width: 100px"
+    style = "margin: 0px 6px; width: 100px",
+    title = "Markdown flavour"
 )) %>%
     append_doms(
-        dom("option", list(value = "Original", innerText = "Original")),
-        dom("option", list(value = "Github", innerText = "Github"))
+        dom("option", list(value = "Github", innerText = "Github")),
+        dom("option", list(value = "Original", innerText = "Original"))
     )
 
 md_btn$onchange <- function() {
-    GFM_FLAG <- select_dom("#md_btn")$options[1]$selected
+    GFM_FLAG <- select_dom("#md_btn")$options[0]$selected
     editor_change()
 }
 
@@ -104,7 +136,8 @@ print_dom(md_btn, "#menu_bar")
 bold_btn <- dom("i", list(
   id = "bold_btn",
   className = "fas fa-bold fa-lg",
-  style = btn_style
+  style = btn_style,
+  title = "Bold"
 ))
 
 bold_btn$onclick <- function() {
@@ -145,7 +178,8 @@ print_dom(bold_btn, "#menu_bar")
 italic_btn <- dom("i", list(
   id = "italic_btn",
   className = "fas fa-italic fa-lg",
-  style = btn_style
+  style = btn_style,
+  title = "Italic"
 ))
 
 italic_btn$onclick <- function() {
@@ -179,7 +213,8 @@ print_dom(italic_btn, "#menu_bar")
 strikethrough_btn <- dom("i", list(
   id = "strikethrough_btn",
   className = "fas fa-strikethrough fa-lg",
-  style = btn_style
+  style = btn_style,
+  title = "Strikethrough"
 ))
 
 strikethrough_btn$onclick <- function() {
@@ -213,7 +248,8 @@ print_dom(strikethrough_btn, "#menu_bar")
 ulist_btn <- dom("i", list(
     id = "ulist_btn",
     className = "fas fa-list-ul fa-lg",
-    style = btn_style
+    style = btn_style,
+    title = "Unordered list"
 ))
 
 ulist_btn$onclick <- function() {
@@ -272,7 +308,8 @@ print_dom(ulist_btn, "#menu_bar")
 olist_btn <- dom("i", list(
   id = "olist_btn",
   className = "fas fa-list-ol fa-lg",
-  style = btn_style
+  style = btn_style,
+  title = "Ordered list"
 ))
 
 olist_btn$onclick <- function() {
@@ -301,7 +338,8 @@ print_dom(olist_btn, "#menu_bar")
 # blockquote ----
 quote_btn <- dom("i", list(id = "quote_btn",
                             className = "fas fa-quote-right fa-lg",
-                            style = btn_style))
+                            style = btn_style,
+                           title = "Blockquote"))
 quote_btn$onclick <- function() {
   declare (range0, indices)
   if (is_selected()) {
@@ -332,8 +370,9 @@ print_dom(quote_btn, "#menu_bar")
 
 # code ----
 code_btn <- dom("i", list(id = "code_btn",
-                            className = "fas fa-code fa-lg",
-                            style = btn_style))
+                          className = "fas fa-code fa-lg",
+                          style = btn_style,
+                          title = "Code"))
 code_btn$onclick <- function() {
   declare (range0, indices)
   if (is_selected()) {
@@ -365,7 +404,8 @@ print_dom(code_btn, "#menu_bar")
 # table ----
 table_btn <- dom("i", list(id = "table_btn",
                           className = "fas fa-table fa-lg",
-                          style = btn_style))
+                          style = btn_style,
+                          title = "Table"))
 table_btn$onclick <- function() {
   declare (table_str)
   table_str <- "|       |       |\n|:-----:|:-----:|\n|       |       |\n"
@@ -389,7 +429,8 @@ print_dom(table_btn, "#menu_bar")
 # link ----
 link_btn <- dom("i", list(id = "link_btn",
                           className = "fas fa-link fa-lg",
-                          style = btn_style))
+                          style = btn_style,
+                          title = "Link"))
 link_btn$onclick <- function() {
   declare (cursor, text)
   if (is_selected()) {
@@ -412,7 +453,8 @@ print_dom(link_btn, "#menu_bar")
 # image ----
 image_btn <- dom("i", list(id = "image_btn",
                           className = "fas fa-image fa-lg",
-                          style = btn_style))
+                          style = btn_style,
+                          title = "Image"))
 image_btn$onclick <- function() {
   declare (cursor, text)
   if (is_selected()) {

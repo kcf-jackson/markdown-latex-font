@@ -105,16 +105,30 @@ editor$commands$addCommand(list(
 
 
 editor$commands$addCommand(list(
-  name = "pdf",
+  name = "load-url",
   bindKey = list(win = "Ctrl-3", mac = "Command-3"),
+  exec = function() { load_url_btn$click() }
+))
+
+
+editor$commands$addCommand(list(
+  name = "pdf",
+  bindKey = list(win = "Ctrl-4", mac = "Command-4"),
   exec = function() { pdf_btn$click() }
 ))
 
 
 editor$commands$addCommand(list(
   name = "md",
-  bindKey = list(win = "Ctrl-4", mac = "Command-4"),
-  exec = function() { md_btn$click() }
+  bindKey = list(win = "Ctrl-5", mac = "Command-5"),
+  exec = function() {
+    if (md_btn$options[0]$selected) {
+      md_btn$options[1]$selected <- TRUE
+    } else {
+      md_btn$options[0]$selected <- TRUE
+    }
+    md_btn$onchange()
+  }
 ))
 
 
@@ -144,10 +158,7 @@ select_dom("#editor")$addEventListener(
 
 hotkey_help <- function(button, hotkey) {
     declare (style_transform, style_width, bound)
-    console::log(button$id)
-    if (button$id == "md_btn") {
-        console::log(select_dom("#" %+% button$id)$getBoundingClientRect())
-    }
+    # console::log(button$id)
     bound <- select_dom("#" %+% button$id)$getBoundingClientRect()
     style_transform <- "transform: translate(" %+% bound$x %+% "px, 32px);"
     style_width <- "width:" %+% bound$width %+% "px;"
@@ -167,17 +178,17 @@ hotkey_help <- function(button, hotkey) {
 }
 
 window$onload <- function() {
-    btn_list <- Array(save_btn, load_btn, pdf_btn, md_btn,
+    btn_list <- Array(save_btn, load_btn, load_url_btn, pdf_btn, md_btn,
                       bold_btn, italic_btn, strikethrough_btn,
                       olist_btn, ulist_btn, quote_btn, code_btn,
                       table_btn, link_btn, image_btn)
-    hotkey_list <- Array("1", "2", "3", "4", "B", "I", "S", "O", "U",
+    hotkey_list <- Array("1", "2", "3", "4", "5", "B", "I", "S", "O", "U",
                          "'", "K", "Y", "L", "G")
     print_dom(dom("div", list(id = "overlay")))
     R::map2(btn_list, hotkey_list, hotkey_help)
 }
 
-GFM_FLAG <- FALSE
+GFM_FLAG <- TRUE
 PDF_FLAG <- FALSE
 
 # Re-render every time the input is changed / updated ----
