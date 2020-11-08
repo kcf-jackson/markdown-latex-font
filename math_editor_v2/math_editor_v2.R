@@ -193,7 +193,7 @@ PDF_FLAG <- FALSE
 
 # Re-render every time the input is changed / updated ----
 editor_change <- function(delta) {
-    declare (dom_str, display_1, display_2, cache, current)
+    declare (dom_str, display_1, display_2, cache, current, scroll_pos)
     # console::log("Rendering")
     dom_str <- editor$getValue() %>%
         marked(list(gfm = GFM_FLAG)) %>%
@@ -203,9 +203,19 @@ editor_change <- function(delta) {
     display_2 <- select_dom("#cache_2")
     cache <- ifelse(is_hidden(display_1), display_1, display_2)
     current <- ifelse(is_hidden(display_1), display_2, display_1)
+    # Get scroll position
+    scroll_pos <- current$
+      contentDocument$
+      querySelector("html")$
+      scrollTop
+
     cache$onload <- function() {
         current$style$display <- "none"
         cache$style$display <- "block"
+        cache$
+          contentDocument$
+          querySelector("html")$
+          scrollTop <- scroll_pos
     }
     cache$srcdoc <- dom_str
 }
